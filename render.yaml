@@ -1,18 +1,23 @@
 services:
   - type: web
     name: sistema-inventario
-    env: java
+    runtime: docker
+    region: oregon        # cambia si prefieres otra región; DB y web deben estar en la misma región
     plan: free
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar
+    healthCheckPath: /
     envVars:
-      - key: JAVA_VERSION
-        value: 17
-      # Variables de conexión a PostgreSQL (Render las llena automáticamente)
-      - key: SPRING_DATASOURCE_URL
+      - key: SPRING_DATASOURCE_HOST
         fromDatabase:
           name: sistema-inventario-db
-          property: connectionString
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: sistema-inventario-db
+          property: port
+      - key: SPRING_DATASOURCE_DB
+        fromDatabase:
+          name: sistema-inventario-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
         fromDatabase:
           name: sistema-inventario-db
@@ -21,12 +26,8 @@ services:
         fromDatabase:
           name: sistema-inventario-db
           property: password
-      # Configuración de JPA
-      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
-        value: update
-      - key: SPRING_JPA_SHOW_SQL
-        value: "true"
-      # Configuración de correo (puedes añadir estas en Render Dashboard → Environment)
+
+      # Mail: se solicitarán al aplicar el Blueprint (no guardes aquí valores en texto plano)
       - key: SPRING_MAIL_USERNAME
         sync: false
       - key: SPRING_MAIL_PASSWORD
@@ -34,6 +35,5 @@ services:
 
 databases:
   - name: sistema-inventario-db
+    region: oregon
     plan: free
-    databaseName: inventario
-    user: inventario_user
