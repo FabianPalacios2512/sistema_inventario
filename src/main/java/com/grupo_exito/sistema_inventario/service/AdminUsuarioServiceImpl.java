@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class AdminUsuarioServiceImpl implements AdminUsuarioService {
 
     @Autowired
-    private UsuarioRepositorio usuarioRepositorio; // Usando tu repositorio
+    private UsuarioRepositorio usuarioRepositorio;
 
     @Autowired
     private RolRepository rolRepository;
@@ -34,30 +34,38 @@ public class AdminUsuarioServiceImpl implements AdminUsuarioService {
 
     @Override
     public Usuario guardarUsuario(UsuarioRegistroDTO registroDTO) {
-        Usuario usuario;
+        
+        // ===== INICIO DE LA VALIDACIÓN =====
+        Optional<Usuario> usuarioExistente = usuarioRepositorio.findByCorreo(registroDTO.getCorreo());
+        
+        // Si es un usuario nuevo (ID es null) y el correo ya existe, lanza error.
+        if (registroDTO.getId() == null && usuarioExistente.isPresent()) {
+            throw new RuntimeException("Ya existe un usuario registrado con el correo: " + registroDTO.getCorreo());
+        }
 
+        // Si se está editando, pero el correo ya pertenece a OTRO usuario, lanza error.
+        if (registroDTO.getId() != null && usuarioExistente.isPresent() && !usuarioExistente.get().getId().equals(registroDTO.getId())) {
+             throw new RuntimeException("El correo " + registroDTO.getCorreo() + " ya está en uso por otro usuario.");
+        }
+        // ===== FIN DE LA VALIDACIÓN =====
+
+        Usuario usuario;
         if (registroDTO.getId() != null) {
-            // Edición de usuario existente
             usuario = usuarioRepositorio.findById(registroDTO.getId())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + registroDTO.getId()));
         } else {
-            // Creación de nuevo usuario
             usuario = new Usuario();
             usuario.setActivo(true);
             usuario.setFechaCreacion(LocalDateTime.now());
         }
 
-        // Mapeando DTO a la entidad con tus nombres de campo
         usuario.setNombre(registroDTO.getNombre());
         usuario.setApellido(registroDTO.getApellido());
         usuario.setCorreo(registroDTO.getCorreo());
 
-        // Actualizar contraseña solo si se proporciona una nueva
         if (registroDTO.getPassword() != null && !registroDTO.getPassword().isEmpty()) {
             usuario.setContrasenaHash(passwordEncoder.encode(registroDTO.getPassword()));
         }
-
-        // Asignar roles (usando ID de tipo Integer)
         if (registroDTO.getRolesIds() != null && !registroDTO.getRolesIds().isEmpty()) {
             Set<Rol> roles = registroDTO.getRolesIds().stream()
                     .map(rolId -> rolRepository.findById(rolId).orElse(null))
@@ -67,13 +75,15 @@ public class AdminUsuarioServiceImpl implements AdminUsuarioService {
         } else {
             usuario.setRoles(new HashSet<>());
         }
-
         return usuarioRepositorio.save(usuario);
     }
 
     @Override
-    public void eliminarUsuario(Integer id) {
-        usuarioRepositorio.deleteById(id);
+    public void cambiarEstadoUsuario(Integer id) {
+        Usuario usuario = usuarioRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
+        usuario.setActivo(!usuario.isActivo());
+        usuarioRepositorio.save(usuario);
     }
 
     @Override

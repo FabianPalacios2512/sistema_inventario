@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface AdminUsuarioService {
     List<Usuario> listarTodosLosUsuarios();
     Usuario guardarUsuario(UsuarioRegistroDTO registroDTO);
-    void eliminarUsuario(Integer id);
+    void cambiarEstadoUsuario(Integer id); // <-- Este es el cambio
     Optional<Usuario> buscarUsuarioPorId(Integer id);
 }

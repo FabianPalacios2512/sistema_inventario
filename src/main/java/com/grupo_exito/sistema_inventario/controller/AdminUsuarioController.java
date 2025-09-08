@@ -28,7 +28,7 @@ public class AdminUsuarioController {
         if (!model.containsAttribute("usuarioDto")) {
             model.addAttribute("usuarioDto", new UsuarioRegistroDTO());
         }
-        return "admin-usuarios"; // Nombre del nuevo archivo HTML
+        return "admin-usuarios";
     }
 
     @PostMapping("/guardar")
@@ -42,18 +42,17 @@ public class AdminUsuarioController {
         return "redirect:/admin/usuarios";
     }
 
-    @PostMapping("/eliminar/{id}")
-    public String eliminarUsuario(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    @PostMapping("/cambiar-estado/{id}")
+    public String cambiarEstadoUsuario(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
-            adminUsuarioService.eliminarUsuario(id);
-            redirectAttributes.addFlashAttribute("success", "Usuario eliminado exitosamente.");
+            adminUsuarioService.cambiarEstadoUsuario(id);
+            redirectAttributes.addFlashAttribute("success", "Estado del usuario cambiado exitosamente.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar el usuario.");
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar el estado del usuario.");
         }
         return "redirect:/admin/usuarios";
     }
 
-    // Endpoint para obtener datos para el modal de edición (vía AJAX)
     @GetMapping("/{id}")
     @ResponseBody
     public UsuarioRegistroDTO obtenerUsuarioParaEditar(@PathVariable Integer id) {
