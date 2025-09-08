@@ -1,11 +1,20 @@
+# render.yaml - Configuración de Infraestructura para Render
+
 services:
+  # Define el servicio web para la aplicación principal
   - type: web
     name: sistema-inventario
-    runtime: docker
-    region: oregon        # cambia si prefieres otra región; DB y web deben estar en la misma región
-    plan: free
-    healthCheckPath: /
+    runtime: docker      # Le dice a Render que use tu Dockerfile para construir la imagen
+    region: oregon       # La región donde se desplegará. Debe ser la misma que la de la base de datos.
+    plan: free           # Plan de servicio gratuito de Render
+    
+    # Ruta para la comprobación de salud. Es más fiable que usar "/"
+    # Requiere que tengas Spring Boot Actuator en tu pom.xml
+    healthCheckPath: /actuator/health
+    
+    # Define las variables de entorno que se inyectarán en tu aplicación
     envVars:
+      # Obtiene los datos de la base de datos de forma segura y los asigna a variables
       - key: SPRING_DATASOURCE_HOST
         fromDatabase:
           name: sistema-inventario-db
@@ -26,14 +35,17 @@ services:
         fromDatabase:
           name: sistema-inventario-db
           property: password
-
-      # Mail: se solicitarán al aplicar el Blueprint (no guardes aquí valores en texto plano)
+          
+      # Variables para el servicio de correo. Se configuran manualmente en el dashboard de Render.
+      # sync: false evita que se borren en futuros despliegues.
       - key: SPRING_MAIL_USERNAME
         sync: false
       - key: SPRING_MAIL_PASSWORD
         sync: false
 
+# Define la base de datos PostgreSQL que usará la aplicación
 databases:
   - name: sistema-inventario-db
     region: oregon
     plan: free
+    ipAllowList: [] # Permite conexiones desde cualquier lugar (necesario para el servicio web de Render)
