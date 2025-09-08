@@ -35,20 +35,22 @@ public class AdminUsuarioServiceImpl implements AdminUsuarioService {
     @Override
     public Usuario guardarUsuario(UsuarioRegistroDTO registroDTO) {
         
-        // ===== INICIO DE LA VALIDACIÓN =====
+        // ===== ¡NUEVA VALIDACIÓN DE ROLES! =====
+        if (registroDTO.getRolesIds() == null || registroDTO.getRolesIds().isEmpty()) {
+            throw new RuntimeException("El usuario debe tener al menos un rol seleccionado.");
+        }
+        // =======================================
+
         Optional<Usuario> usuarioExistente = usuarioRepositorio.findByCorreo(registroDTO.getCorreo());
         
-        // Si es un usuario nuevo (ID es null) y el correo ya existe, lanza error.
         if (registroDTO.getId() == null && usuarioExistente.isPresent()) {
             throw new RuntimeException("Ya existe un usuario registrado con el correo: " + registroDTO.getCorreo());
         }
 
-        // Si se está editando, pero el correo ya pertenece a OTRO usuario, lanza error.
         if (registroDTO.getId() != null && usuarioExistente.isPresent() && !usuarioExistente.get().getId().equals(registroDTO.getId())) {
              throw new RuntimeException("El correo " + registroDTO.getCorreo() + " ya está en uso por otro usuario.");
         }
-        // ===== FIN DE LA VALIDACIÓN =====
-
+        
         Usuario usuario;
         if (registroDTO.getId() != null) {
             usuario = usuarioRepositorio.findById(registroDTO.getId())
@@ -66,15 +68,13 @@ public class AdminUsuarioServiceImpl implements AdminUsuarioService {
         if (registroDTO.getPassword() != null && !registroDTO.getPassword().isEmpty()) {
             usuario.setContrasenaHash(passwordEncoder.encode(registroDTO.getPassword()));
         }
-        if (registroDTO.getRolesIds() != null && !registroDTO.getRolesIds().isEmpty()) {
-            Set<Rol> roles = registroDTO.getRolesIds().stream()
-                    .map(rolId -> rolRepository.findById(rolId).orElse(null))
-                    .filter(rol -> rol != null)
-                    .collect(Collectors.toSet());
-            usuario.setRoles(roles);
-        } else {
-            usuario.setRoles(new HashSet<>());
-        }
+        
+        Set<Rol> roles = registroDTO.getRolesIds().stream()
+                .map(rolId -> rolRepository.findById(rolId).orElse(null))
+                .filter(rol -> rol != null)
+                .collect(Collectors.toSet());
+        usuario.setRoles(roles);
+
         return usuarioRepositorio.save(usuario);
     }
 
