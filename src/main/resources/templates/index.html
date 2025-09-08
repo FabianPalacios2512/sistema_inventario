@@ -51,10 +51,14 @@
                 <img th:src="@{/img/logo_exito.png}" alt="Logo" class="w-28">
             </div>
             <nav class="flex-1 px-4 py-4 space-y-2">
-                <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-white bg-sky-500 font-semibold shadow"><i class="fas fa-home w-6 text-lg"></i><span class="ml-4">Panel de Control</span></a>
+                <a th:href="@{/}" class="flex items-center px-3 py-2.5 rounded-lg text-white bg-sky-500 font-semibold shadow"><i class="fas fa-home w-6 text-lg"></i><span class="ml-4">Panel de Control</span></a>
                 <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium"><i class="fas fa-boxes-stacked w-6 text-lg text-slate-400"></i><span class="ml-4">Inventario</span></a>
                 <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium"><i class="fas fa-chart-pie w-6 text-lg text-slate-400"></i><span class="ml-4">Reportes</span></a>
-                <a href="#" sec:authorize="hasRole('ADMINISTRADOR')" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium"><i class="fas fa-users-cog w-6 text-lg text-slate-400"></i><span class="ml-4">Admin Usuarios</span></a>
+                
+                <!-- ===== LÍNEA CORREGIDA ===== -->
+                <a th:href="@{/admin/usuarios}" sec:authorize="hasAuthority('ROLE_ADMINISTRADOR')" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium"><i class="fas fa-users-cog w-6 text-lg text-slate-400"></i><span class="ml-4">Admin Usuarios</span></a>
+                <!-- =========================== -->
+
             </nav>
             <div class="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
                  <div class="flex items-center">
@@ -69,7 +73,7 @@
             <header class="bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg z-10 border-b border-slate-200/30 dark:border-slate-700/30">
                 <div class="mx-auto px-6 h-20 flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 dark:text-white">Hola, <span th:text="${#authentication.principal.username.split('@')[0]}"></span> 👋</h1>
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white">Hola, <span th:text="${#authentication.principal.username}"></span> 👋</h1>
                         <p id="live-clock" class="text-sm text-slate-500 dark:text-slate-400"></p>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -97,7 +101,7 @@
                                 <button data-view="product" class="tab-btn px-3 py-1 text-sm font-semibold text-slate-500 dark:text-slate-400 rounded-md">Por Producto</button>
                             </div>
                             <div id="time-filters" class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-700 p-1 rounded-lg">
-                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="chart-controls" class="mb-4 relative">
@@ -117,7 +121,7 @@
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm text-left"><thead class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase text-slate-500 dark:text-slate-400"><tr><th class="p-3">Producto</th><th class="p-3">Tipo</th><th class="p-3">Cantidad</th><th class="p-3">Fecha</th></tr></thead>
                                 <tbody>
-                                    <tr class="border-b dark:border-slate-700/50"><td class="p-3 font-medium text-slate-800 dark:text-white">Televisor OLED 55"</td><td class="p-3"><span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full dark:text-green-200 dark:bg-green-700/20">Venta</span></td><td class="p-3 font-medium text-slate-800 dark:text-white">-5</td><td class="p-3 text-slate-500 dark:text-slate-400">Hoy, 07:15 a. m.</td></tr>
+                                    <tr class="border-b dark:border-slate-700/50"><td class="p-3 font-medium text-slate-800 dark:text-white">Televisor OLED 55"</td><td class="p-3"><span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full dark:text-green-200 dark:bg-green-700/20">Venta</span></td><td class="p-3 font-medium text-slate-800 dark:text-white">-5</td><td class="p-3 text-slate-500 dark:text-slate-400">Hoy, 12:01 p. m.</td></tr>
                                     <tr class="border-b dark:border-slate-700/50"><td class="p-3 font-medium text-slate-800 dark:text-white">Audífonos Inalámbricos</td><td class="p-3"><span class="px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded-full dark:text-blue-200 dark:bg-blue-700/20">Ingreso</span></td><td class="p-3 font-medium text-slate-800 dark:text-white">+50</td><td class="p-3 text-slate-500 dark:text-slate-400">Ayer, 04:30 p. m.</td></tr>
                                     <tr><td class="p-3 font-medium text-slate-800 dark:text-white">Cafetera Programable</td><td class="p-3"><span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full dark:text-green-200 dark:bg-green-700/20">Venta</span></td><td class="p-3 font-medium text-slate-800 dark:text-white">-2</td><td class="p-3 text-slate-500 dark:text-slate-400">Hace 3 días, 09:00 a. m.</td></tr>
                                 </tbody></table>
@@ -158,7 +162,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Lógica del Reloj en Vivo para Colombia ---
             const clockElement = document.getElementById('live-clock');
             function updateClock() {
                 const now = new Date();
@@ -169,7 +172,6 @@
             setInterval(updateClock, 1000);
             updateClock();
 
-            // --- Lógica de la Paleta de Comandos ---
             const cmdButton = document.getElementById('command-palette-button');
             const cmdModal = document.getElementById('command-palette-modal');
             const toggleCommandPalette = () => cmdModal.classList.toggle('hidden');
@@ -180,7 +182,6 @@
                 if (e.key === 'Escape' && !cmdModal.classList.contains('hidden')) { toggleCommandPalette(); }
             });
 
-            // --- Lógica del Cambio de Tema ---
             const themeToggleBtn = document.getElementById('theme-toggle');
             const updateTheme = () => {
                 const isDark = document.documentElement.classList.contains('dark');
@@ -200,100 +201,20 @@
                 updateTheme();
             });
             
-            // --- Lógica de Gráficos Unificados (CORREGIDA Y MEJORADA) ---
-            const chartTitleSection = document.getElementById('chart-title-section');
-            const productSearchInput = document.getElementById('product-search');
-            const productSearchIcon = document.getElementById('product-search-icon');
-            const chartTabs = document.querySelectorAll('#chart-tabs button');
-            const timeFiltersContainer = document.getElementById('time-filters');
-            
-            const salesData = {
-                monthly: { series: [{ name: 'Ventas', data: [450, 550, 620, 580, 700, 800, 750, 900, 850, 1100, 1050, 1200] }], categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] },
-                annual: { series: [{ name: 'Ventas', data: [12000, 15000, 18000, 22000, 25000] }], categories: ['2020', '2021', '2022', '2023', '2024'] }
-            };
-            const productSalesData = {
-                monthly: { series: [{ name: 'Ventas', data: [150, 200, 180, 220, 250, 300, 280, 320, 310, 350, 340, 400] }], categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] },
-                annual: { series: [{ name: 'Ventas', data: [1500, 1800, 2200, 2500, 3000] }], categories: ['2020', '2021', '2022', '2023', '2024'] }
-            };
-
-            const getBaseChartOptions = () => ({
-                chart: { type: 'area', height: '100%', toolbar: { show: false }, background: 'transparent' },
-                dataLabels: { enabled: false }, stroke: { curve: 'smooth', width: 3 },
-                fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.1, stops: [0, 95, 100] } },
-                grid: { borderColor: '#e2e8f030', strokeDashArray: 5, padding: { left: -10, right: 10 } },
-                tooltip: { theme: localStorage.getItem('theme') || 'light' }, legend: { show: false },
-                xaxis: { labels: { style: { colors: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b' } }, axisBorder: { show: false }, axisTicks: { show: false } },
-                yaxis: { labels: { style: { colors: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b' } }, min: 0 }
-            });
-
-            // Se inicializa el gráfico con la configuración y datos por defecto (Visión General, Mensual)
-            const initialChartOptions = {
-                ...getBaseChartOptions(),
-                series: salesData.monthly.series,
-                xaxis: { ...getBaseChartOptions().xaxis, categories: salesData.monthly.categories },
-                colors: ['#0ea5e9']
-            };
+            // --- Lógica de Gráficos ---
+            const chartTitleSection = document.getElementById('chart-title-section'), productSearchInput = document.getElementById('product-search'), productSearchIcon = document.getElementById('product-search-icon'), chartTabs = document.querySelectorAll('#chart-tabs button'), timeFiltersContainer = document.getElementById('time-filters');
+            const salesData = { monthly: { series: [{ name: 'Ventas', data: [450, 550, 620, 580, 700, 800, 750, 900, 850, 1100, 1050, 1200] }], categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] }, annual: { series: [{ name: 'Ventas', data: [12000, 15000, 18000, 22000, 25000] }], categories: ['2020', '2021', '2022', '2023', '2024'] } };
+            const productSalesData = { monthly: { series: [{ name: 'Ventas', data: [150, 200, 180, 220, 250, 300, 280, 320, 310, 350, 340, 400] }], categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] }, annual: { series: [{ name: 'Ventas', data: [1500, 1800, 2200, 2500, 3000] }], categories: ['2020', '2021', '2022', '2023', '2024'] } };
+            const getBaseChartOptions = () => ({ chart: { type: 'area', height: '100%', toolbar: { show: false }, background: 'transparent' }, dataLabels: { enabled: false }, stroke: { curve: 'smooth', width: 3 }, fill: { type: 'gradient', gradient: { opacityFrom: 0.6, opacityTo: 0.1, stops: [0, 95, 100] } }, grid: { borderColor: '#e2e8f030', strokeDashArray: 5, padding: { left: -10, right: 10 } }, tooltip: { theme: localStorage.getItem('theme') || 'light' }, legend: { show: false }, xaxis: { labels: { style: { colors: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b' } }, axisBorder: { show: false }, axisTicks: { show: false } }, yaxis: { labels: { style: { colors: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b' } }, min: 0 } });
+            const initialChartOptions = { ...getBaseChartOptions(), series: salesData.monthly.series, xaxis: { ...getBaseChartOptions().xaxis, categories: salesData.monthly.categories }, colors: ['#0ea5e9'] };
             window.mainChart = new ApexCharts(document.querySelector("#main-chart"), initialChartOptions);
             mainChart.render();
-
-            let currentChartView = 'general';
-            let currentChartTimeframe = 'monthly';
-
-            const renderTimeFilters = (filters) => {
-                timeFiltersContainer.innerHTML = '';
-                filters.forEach(timeframe => {
-                    const button = document.createElement('button');
-                    button.dataset.timeframe = timeframe;
-                    button.className = 'chart-filter-btn px-3 py-1 text-sm font-semibold text-slate-500 dark:text-slate-400 rounded-md transition-all-300';
-                    button.textContent = timeframe.charAt(0).toUpperCase() + timeframe.slice(1);
-                    if (timeframe === currentChartTimeframe) {
-                        button.classList.add('active');
-                    }
-                    button.addEventListener('click', () => {
-                        document.querySelectorAll('#time-filters .chart-filter-btn').forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-                        currentChartTimeframe = timeframe;
-                        updateChart();
-                    });
-                    timeFiltersContainer.appendChild(button);
-                });
-            };
-
-            const updateChart = () => {
-                let data = currentChartView === 'general' ? salesData[currentChartTimeframe] : productSalesData[currentChartTimeframe];
-                let color = currentChartView === 'general' ? ['#0ea5e9'] : ['#22c55e'];
-                mainChart.updateOptions({ series: data.series, xaxis: { categories: data.categories }, colors: color });
-            };
-
-            const updateChartViewUI = (view) => {
-                currentChartView = view;
-                if (view === 'general') {
-                    productSearchInput.classList.add('hidden');
-                    productSearchIcon.classList.add('hidden');
-                    chartTitleSection.querySelector('h3').textContent = 'Rendimiento General de Ventas';
-                    chartTitleSection.querySelector('p').textContent = 'Visión general de todas las ventas.';
-                    currentChartTimeframe = 'monthly'; // Reset
-                    renderTimeFilters(['monthly', 'annual']);
-                } else if (view === 'product') {
-                    productSearchInput.classList.remove('hidden');
-                    productSearchIcon.classList.remove('hidden');
-                    chartTitleSection.querySelector('h3').innerHTML = 'Análisis de Producto: <span class="text-sky-500">Televisor OLED 55"</span>';
-                    chartTitleSection.querySelector('p').textContent = 'Rendimiento de ventas del producto seleccionado.';
-                    currentChartTimeframe = 'monthly'; // Reset
-                    renderTimeFilters(['monthly', 'annual']);
-                }
-                updateChart();
-            };
-
-            chartTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    chartTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    updateChartViewUI(tab.dataset.view);
-                });
-            });
+            let currentChartView = 'general', currentChartTimeframe = 'monthly';
+            const renderTimeFilters = (filters) => { timeFiltersContainer.innerHTML = ''; filters.forEach(timeframe => { const button = document.createElement('button'); button.dataset.timeframe = timeframe; button.className = 'chart-filter-btn px-3 py-1 text-sm font-semibold text-slate-500 dark:text-slate-400 rounded-md transition-all-300'; button.textContent = timeframe.charAt(0).toUpperCase() + timeframe.slice(1); if (timeframe === currentChartTimeframe) { button.classList.add('active'); } button.addEventListener('click', () => { document.querySelectorAll('#time-filters .chart-filter-btn').forEach(btn => btn.classList.remove('active')); button.classList.add('active'); currentChartTimeframe = timeframe; updateChart(); }); timeFiltersContainer.appendChild(button); }); };
+            const updateChart = () => { let data = currentChartView === 'general' ? salesData[currentChartTimeframe] : productSalesData[currentChartTimeframe]; let color = currentChartView === 'general' ? ['#0ea5e9'] : ['#22c55e']; mainChart.updateOptions({ series: data.series, xaxis: { categories: data.categories }, colors: color }); };
+            const updateChartViewUI = (view) => { currentChartView = view; if (view === 'general') { productSearchInput.classList.add('hidden'); productSearchIcon.classList.add('hidden'); chartTitleSection.querySelector('h3').textContent = 'Rendimiento General de Ventas'; chartTitleSection.querySelector('p').textContent = 'Visión general de todas las ventas.'; currentChartTimeframe = 'monthly'; renderTimeFilters(['monthly', 'annual']); } else if (view === 'product') { productSearchInput.classList.remove('hidden'); productSearchIcon.classList.remove('hidden'); chartTitleSection.querySelector('h3').innerHTML = 'Análisis de Producto: <span class="text-sky-500">Televisor OLED 55"</span>'; chartTitleSection.querySelector('p').textContent = 'Rendimiento de ventas del producto seleccionado.'; currentChartTimeframe = 'monthly'; renderTimeFilters(['monthly', 'annual']); } updateChart(); };
+            chartTabs.forEach(tab => { tab.addEventListener('click', () => { chartTabs.forEach(t => t.classList.remove('active')); tab.classList.add('active'); updateChartViewUI(tab.dataset.view); }); });
             
-            // Inicializar la vista y el tema
             updateChartViewUI('general');
             updateTheme();
         });

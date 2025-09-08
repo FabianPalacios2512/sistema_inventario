@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Usuarios | Grupo Éxito</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>tailwind.config = { darkMode: 'class' };</script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); } 
+        else { document.documentElement.classList.remove('dark'); }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .aurora-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-color: #f8fafc; }
+        .dark .aurora-background { background-color: #020617; }
+        .aurora-background::before, .aurora-background::after { content: ''; position: absolute; width: 50vw; height: 50vw; border-radius: 50%; filter: blur(120px); opacity: 0.1; }
+        .aurora-background::before { background: radial-gradient(circle, #38bdf8, transparent); top: -15%; left: -15%; }
+        .aurora-background::after { background: radial-gradient(circle, #fbbf24, transparent); bottom: -15%; right: -15%; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        nav a.active { background-color: #0ea5e9; color: white; font-weight: 600; }
+        .dark nav a.active { background-color: #38bdf8; }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="aurora-background"></div>
+    <div class="flex h-screen">
+        <aside class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg w-64 flex-col z-40 shadow-lg border-r border-slate-200/50 dark:border-slate-700/50 hidden md:flex">
+            <div class="flex items-center justify-center h-20 border-b border-slate-200/50 dark:border-slate-700/50"><img th:src="@{/img/logo_exito.png}" alt="Logo" class="w-28"></div>
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a th:href="@{/}" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 font-medium"><i class="fas fa-home w-6 text-lg text-slate-400"></i><span class="ml-4">Panel de Control</span></a>
+                <a th:href="@{/admin/usuarios}" sec:authorize="hasAuthority('ROLE_ADMINISTRADOR')" class="active flex items-center px-3 py-2.5 rounded-lg shadow"><i class="fas fa-users-cog w-6 text-lg"></i><span class="ml-4">Admin Usuarios</span></a>
+            </nav>
+            <div class="p-4 border-t border-slate-200/50 dark:border-slate-700/50">
+                 <div class="flex items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center bg-amber-400 text-slate-800 font-bold"><span th:text="${#strings.substring(#authentication.principal.username, 0, 1).toUpperCase()}"></span></div><div class="ml-3 flex-1"><p class="font-bold text-sm text-slate-800 dark:text-white truncate" th:text="${#authentication.principal.username}"></p><p class="text-xs text-slate-500 dark:text-slate-400" th:text="${#strings.capitalize(#strings.replace(#authentication.principal.authorities[0].getAuthority().toLowerCase(), 'role_', ''))}"></p></div><form th:action="@{/logout}" method="post" class="ml-auto"><button type="submit" title="Cerrar Sesión" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5"><i class="fas fa-sign-out-alt text-lg"></i></button></form></div>
+            </div>
+        </aside>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg z-10 border-b border-slate-200/30 dark:border-slate-700/30">
+                <div class="mx-auto px-6 h-20 flex items-center justify-between"><div><h1 class="text-2xl font-black text-slate-900 dark:text-white">Administración de Usuarios</h1><p class="text-sm text-slate-500 dark:text-slate-400">Crea, edita y gestiona los usuarios del sistema.</p></div><div class="flex items-center space-x-4"><button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700"><i id="theme-toggle-dark-icon" class="fas fa-moon text-lg"></i><i id="theme-toggle-light-icon" class="fas fa-sun text-lg"></i></button></div></div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-6 animate-fadeIn space-y-6">
+                <div th:if="${success}" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg" role="alert"><p th:text="${success}"></p></div>
+                <div th:if="${error}" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"><p th:text="${error}"></p></div>
+                <div class="bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg p-6 rounded-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-slate-900 dark:text-white">Lista de Usuarios</h2><button id="open-modal-btn" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2"><i class="fas fa-plus"></i><span>Nuevo Usuario</span></button></div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-slate-50 dark:bg-slate-700/50 text-xs uppercase text-slate-500 dark:text-slate-400"><tr><th class="p-3">Nombre</th><th class="p-3">Correo</th><th class="p-3">Roles</th><th class="p-3 text-center">Acciones</th></tr></thead>
+                        <tbody>
+                            <tr th:each="usuario : ${usuarios}" class="border-b dark:border-slate-700/50">
+                                <td class="p-3 font-medium text-slate-800 dark:text-white" th:text="${usuario.nombre + ' ' + usuario.apellido}"></td>
+                                <td class="p-3 text-slate-500 dark:text-slate-400" th:text="${usuario.correo}"></td>
+                                <td class="p-3"><span th:each="rol : ${usuario.roles}" th:text="${rol.nombre}" class="px-2 py-1 mr-1 text-xs font-semibold rounded-full" th:classappend="${rol.nombre == 'ADMINISTRADOR'} ? 'bg-amber-100 text-amber-800 dark:bg-amber-700/30 dark:text-amber-300' : 'bg-sky-100 text-sky-800 dark:bg-sky-700/30 dark:text-sky-300'"></span></td>
+                                <td class="p-3 text-center">
+                                    <button class="edit-btn text-blue-500 hover:text-blue-700 mr-4" th:data-id="${usuario.id}" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                                    <form th:action="@{/admin/usuarios/eliminar/{id}(id=${usuario.id})}" method="post" class="inline" onsubmit="return confirm('¿Estás seguro de que quieres eliminar a este usuario?');"><button type="submit" class="text-red-500 hover:text-red-700" title="Eliminar"><i class="fas fa-trash-alt"></i></button></form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div id="user-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center animate-fadeIn">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-xl shadow-2xl border dark:border-slate-700">
+            <form th:action="@{/admin/usuarios/guardar}" th:object="${usuarioDto}" method="post" id="user-form">
+                <input type="hidden" th:field="*{id}" id="form-user-id">
+                <div class="p-6 border-b dark:border-slate-700"><h3 id="modal-title" class="text-xl font-bold text-slate-900 dark:text-white"></h3></div>
+                <div class="p-6 space-y-4">
+                    <div><label for="nombre" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nombre</label><input type="text" th:field="*{nombre}" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md" required></div>
+                    <div><label for="apellido" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Apellido</label><input type="text" th:field="*{apellido}" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md" required></div>
+                    <div><label for="correo" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Correo Electrónico</label><input type="email" th:field="*{correo}" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md" required></div>
+                    <div><label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Contraseña</label><input type="password" th:field="*{password}" id="password-field" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md" placeholder="Dejar en blanco para no cambiar"></div>
+                    <div><label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Roles</label><div class="mt-2 space-y-2"><div th:each="rol : ${todosLosRoles}" class="flex items-center"><input type="checkbox" th:field="*{rolesIds}" th:value="${rol.id}" class="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"><label th:for="${#ids.prev('rolesIds')}" th:text="${rol.nombre}" class="ml-3 text-slate-600 dark:text-slate-400"></label></div></div></div>
+                </div>
+                <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex justify-end space-x-3 rounded-b-xl"><button type="button" id="close-modal-btn" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-bold py-2 px-4 rounded-lg border border-slate-300 dark:border-slate-600">Cancelar</button><button type="submit" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded-lg">Guardar Cambios</button></div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const updateTheme = () => { const isDark = document.documentElement.classList.contains('dark'); document.getElementById('theme-toggle-dark-icon').style.display = isDark ? 'none' : 'block'; document.getElementById('theme-toggle-light-icon').style.display = isDark ? 'block' : 'none'; };
+            themeToggleBtn.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); updateTheme(); });
+            updateTheme();
+
+            const modal = document.getElementById('user-modal'), openModalBtn = document.getElementById('open-modal-btn'), closeModalBtn = document.getElementById('close-modal-btn'), userForm = document.getElementById('user-form'), modalTitle = document.getElementById('modal-title'), passwordField = document.getElementById('password-field');
+            const openModal = () => modal.classList.remove('hidden'), closeModal = () => modal.classList.add('hidden');
+
+            openModalBtn.addEventListener('click', () => {
+                userForm.reset();
+                document.getElementById('form-user-id').value = '';
+                modalTitle.textContent = 'Nuevo Usuario';
+                passwordField.setAttribute('placeholder', 'Contraseña (requerida)');
+                passwordField.setAttribute('required', 'true');
+                openModal();
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const userId = button.dataset.id;
+                    const response = await fetch(`/admin/usuarios/${userId}`);
+                    const userData = await response.json();
+                    
+                    userForm.reset();
+                    document.getElementById('form-user-id').value = userData.id;
+                    userForm.querySelector('[name="nombre"]').value = userData.nombre;
+                    userForm.querySelector('[name="apellido"]').value = userData.apellido;
+                    userForm.querySelector('[name="correo"]').value = userData.correo;
+                    
+                    document.querySelectorAll('input[name="rolesIds"]').forEach(checkbox => checkbox.checked = userData.rolesIds.includes(Number(checkbox.value)));
+
+                    modalTitle.textContent = 'Editar Usuario';
+                    passwordField.setAttribute('placeholder', 'Dejar en blanco para no cambiar');
+                    passwordField.removeAttribute('required');
+                    openModal();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

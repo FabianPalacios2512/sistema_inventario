@@ -21,11 +21,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // --- ESTA ES LA LÍNEA CLAVE DE LA CORRECCIÓN ---
-                // Permite el acceso público a estas páginas y recursos estáticos
                 .requestMatchers("/login", "/forgot-password", "/reset-password", "/css/**", "/js/**", "/img/**").permitAll()
-                
-                // Exige autenticación para cualquier otra solicitud
+                // --- ¡REGLA AÑADIDA! ---
+                // Solo usuarios con rol "ADMINISTRADOR" pueden acceder a estas rutas.
+                // Usamos hasAuthority porque tu UserDetailsServiceImpl añade el prefijo "ROLE_"
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMINISTRADOR")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -40,7 +40,6 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
             );
-
         return http.build();
     }
 }
