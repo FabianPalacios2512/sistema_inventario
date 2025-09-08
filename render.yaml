@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: sistema-inventario
+    env: java
+    plan: free
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 17
+      # Variables de conexión a PostgreSQL (Render las llena automáticamente)
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: sistema-inventario-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: sistema-inventario-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: sistema-inventario-db
+          property: password
+      # Configuración de JPA
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: SPRING_JPA_SHOW_SQL
+        value: "true"
+      # Configuración de correo (puedes añadir estas en Render Dashboard → Environment)
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+
+databases:
+  - name: sistema-inventario-db
+    plan: free
+    databaseName: inventario
+    user: inventario_user
