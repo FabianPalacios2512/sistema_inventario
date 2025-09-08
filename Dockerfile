@@ -1,16 +1,30 @@
-# Etapa 1: Compilación con Maven y Java 17/21
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY .mvn .mvn
-COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
-COPY src ./src
-RUN ./mvnw clean package -DskipTests
+# Usa una imagen base que ya tiene Java 21 instalado
+FROM eclipse-temurin:21-jdk AS build
 
-# Etapa 2: Ejecución en un entorno ligero de Java
+# Establece el directorio de trabajo
+WORKDIR /workspace/app
+
+# Copia el wrapper de Maven y el pom.xml
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Descarga las dependencias
+RUN ./mvnw dependency:go-offline
+
+# Copia el código fuente y construye la aplicación
+COPY src src
+RUN ./mvnw package -DskipTests
+
+# Ahora, crea la imagen final usando solo el JRE (más ligera)
 FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-# Render asignará un puerto a la variable PORT
-EXPOSE 8080
-CMD ["java", "-Dserver.port=${PORT}", "-jar", "/app/app.jar"]
+VOLUME /tmp
+
+# Copia el archivo .jar desde la etapa de 'build'
+COPY --from=build /workspace/app/target/*.jar app.jar
+
+# Expone el puerto que usará Render
+EXPOSE 10000
+
+# Comando para arrancar la aplicación
+ENTRYPOINT ["java","-jar","/app.jar"]
