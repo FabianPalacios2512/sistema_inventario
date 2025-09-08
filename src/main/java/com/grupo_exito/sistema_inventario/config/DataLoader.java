@@ -56,6 +56,20 @@ public class DataLoader implements CommandLineRunner {
             usuarioRepositorio.save(admin);
         }
 
+         if (usuarioRepositorio.findByCorreo("fpaternina12@gmail.com").isEmpty()) {
+            Rol rolAdmin = rolRepository.findByNombre("ADMINISTRADOR").orElseThrow();
+            
+            Usuario admin = new Usuario();
+            admin.setNombre("fabian");
+            admin.setApellido("PALACIOSs");
+            admin.setCorreo("fpaternina12@gmail.com");
+            admin.setContrasenaHash(passwordEncoder.encode("12345"));
+            admin.setActivo(true);
+            admin.setFechaCreacion(LocalDateTime.now());
+            admin.setRoles(Set.of(rolAdmin));
+            usuarioRepositorio.save(admin);
+        }
+
         // Crear usuario Gerente de Inventario
         if (usuarioRepositorio.findByCorreo("gerente.inventario@grupoexito.com").isEmpty()) {
             Rol rolGerente = rolRepository.findByNombre("CONTROLADOR_INVENTARIO").orElseThrow();

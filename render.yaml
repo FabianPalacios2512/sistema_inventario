@@ -14,6 +14,11 @@ services:
     
     # Define las variables de entorno que se inyectarán en tu aplicación
     envVars:
+      # --- ¡LÍNEA AÑADIDA! ---
+      # Activa el perfil 'prod' para que Spring use application-prod.properties
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
       # Obtiene los datos de la base de datos de forma segura y los asigna a variables
       - key: SPRING_DATASOURCE_HOST
         fromDatabase:
@@ -48,4 +53,4 @@ databases:
   - name: sistema-inventario-db
     region: oregon
     plan: free
-    ipAllowList: [] # Permite conexiones desde cualquier lugar (necesario para el servicio web de Render)
+    # ipAllowList: [] # Dejar vacío o eliminar para permitir conexiones de servicios internos de Render
