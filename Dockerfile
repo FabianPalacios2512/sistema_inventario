@@ -8,6 +8,8 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src ./src
 
+RUN chmod +x mvnw
+
 # Usamos -B para modo batch y -DskipTests para acelerar
 RUN ./mvnw -B package -DskipTests
 
@@ -21,5 +23,6 @@ COPY --from=build /workspace/app/target/*.jar app.jar
 # Expone el puerto que la plataforma asignará
 EXPOSE 8080
 
-# Comando para arrancar la aplicación, usando el puerto que nos dé la plataforma
-ENTRYPOINT ["java", "-Dserver.port=${PORT}", "-jar","/app/app.jar"]
+# ===== LÍNEA MODIFICADA (más simple y robusta) =====
+ENTRYPOINT ["java", "-jar","/app/app.jar"]
+# ==================================================
